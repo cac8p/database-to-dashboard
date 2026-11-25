@@ -1,8 +1,13 @@
-# Step 1: data generator
-pandas>=2.2
-numpy>=1.26
-faker>=25.0
+# Exact versions pinned so anyone who runs the generator gets identical data.
+# (Unpinned versions can produce slightly different random output.)
 
-# Step 2 (coming next): database + transformation layer
-# duckdb
+# Step 1: data generator
+pandas==3.1.1
+numpy==2.5.5
+faker==40.63.0
+
+# Step 2: database (bronze layer)
+duckdb==2.0.1
+
+# Step 3 (coming next): transformation layer
 # dbt-duckdb

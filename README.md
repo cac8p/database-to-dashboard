@@ -19,8 +19,8 @@ An end-to-end analytics engineering project. It takes raw, messy data from a fic
 | Layer | Tool | Status |
 |---|---|---|
 | Source data | Python generator (pandas, Faker) | ✅ Done |
-| Database | DuckDB (local), then Snowflake | ⏳ Next |
-| Transformations + tests | dbt | ⏳ |
+| Database + bronze layer | DuckDB (local), then Snowflake | ✅ Bronze loaded |
+| Transformations + tests | dbt | ⏳ Next |
 | Dashboard | Power BI | ⏳ |
 | Second source | SEC EDGAR + FRED public APIs | ⏳ |
 
@@ -44,7 +44,8 @@ data/raw/sec_edgar/  Public financial data (phase 2)
 dbt/            Bronze/silver/gold transformation project
 powerbi/        Power BI report file
 docs/           Data dictionary, setup notes, data quality log
-scripts/        Load / ingestion scripts
+scripts/        Load / ingestion scripts (load_bronze.py, run_sql.py)
+sql/            Exploration queries
 ```
 
 ## Run it yourself
@@ -53,7 +54,9 @@ scripts/        Load / ingestion scripts
 python -m venv .venv
 .venv\Scripts\activate          # Windows  (Mac/Linux: source .venv/bin/activate)
 pip install -r requirements.txt
-python generator/generate_saas_data.py
+python generator/generate_saas_data.py     # create the raw source data
+python scripts/load_bronze.py              # load it into DuckDB (bronze layer)
+python scripts/run_sql.py sql/01_first_look_bronze.sql   # explore it
 ```
 
 That creates about 2,000 accounts, 25,000 users, 4,500 subscriptions, 7,400 invoices and 390,000 usage events covering Jan 2023 to Oct 2026. The same seed always produces the same data.

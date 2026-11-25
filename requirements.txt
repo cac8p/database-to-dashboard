@@ -1,0 +1,8 @@
+# Step 1: data generator
+pandas>=2.2
+numpy>=1.26
+faker>=25.0
+
+# Step 2 (coming next): database + transformation layer
+# duckdb
+# dbt-duckdb

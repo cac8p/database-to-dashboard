@@ -1,0 +1,27 @@
+# Python virtual environment and caches
+.venv/
+__pycache__/
+*.pyc
+
+# Generated raw data: anyone can recreate it by running the generator,
+# so it stays out of GitHub (keeps the repo small)
+data/raw/**/*.csv
+!data/raw/**/.gitkeep
+
+# Local database files
+*.duckdb
+*.duckdb.wal
+
+# dbt build output
+dbt/**/target/
+dbt/**/dbt_packages/
+dbt/**/logs/
+
+# Secrets: never commit passwords or API keys
+.env
+profiles.yml
+
+# Editor / OS clutter
+.vscode/
+.DS_Store
+Thumbs.db

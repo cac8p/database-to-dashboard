@@ -9,5 +9,6 @@ faker==40.63.0
 # Step 2: database (bronze layer)
 duckdb==2.0.1
 
-# Step 3 (coming next): transformation layer
-# dbt-duckdb
+# Step 3: transformation layer (silver and gold)
+dbt-core==1.12.7
+dbt-duckdb==1.11.1

@@ -1,0 +1,145 @@
+# ---------------------------------------------------------------------------
+# SILVER models: descriptions + DATA TESTS
+#
+# Tests are dbt's way of proving the cleaning worked. Each one is a rule;
+# `dbt build` checks every rule after building the table and fails loudly
+# if any row breaks it. Common built-in tests:
+#   unique          - no value appears twice (e.g. no duplicate IDs)
+#   not_null        - no blanks
+#   accepted_values - only values from an approved list
+#   relationships   - every value exists in another table (no orphans)
+# ---------------------------------------------------------------------------
+version: 2
+
+models:
+
+  - name: account_id_map
+    description: Maps every CRM account_id (including duplicates) to its master account_id.
+    columns:
+      - name: crm_account_id
+        description: The original CRM record ID.
+        data_tests: [unique, not_null]
+      - name: account_id
+        description: The master record this CRM record rolls up to.
+        data_tests: [not_null]
+
+  - name: accounts
+    description: One row per real company. Duplicates merged, regions and countries standardized.
+    columns:
+      - name: account_id
+        data_tests: [unique, not_null]
+      - name: domain
+        description: Normalized website. Domain + country is the key used to detect duplicates.
+        data_tests: [not_null]
+      - name: region
+        data_tests:
+          - accepted_values:
+              arguments:
+                values: ['North America', 'EMEA', 'APAC', 'LATAM']
+      - name: crm_record_count
+        description: Number of CRM records merged into this account (1 = no duplicates).
+
+  - name: sales_reps
+    columns:
+      - name: rep_id
+        data_tests: [unique, not_null]
+
+  - name: products
+    columns:
+      - name: product_id
+        data_tests: [unique, not_null]
+
+  - name: subscriptions
+    description: One row per product per contract term, with contract value in local currency and USD.
+    columns:
+      - name: subscription_id
+        data_tests: [unique, not_null]
+      - name: account_id
+        data_tests:
+          - not_null
+          - relationships:
+              arguments:
+                to: ref('accounts')
+                field: account_id
+      - name: product_id
+        data_tests:
+          - relationships:
+              arguments:
+                to: ref('products')
+                field: product_id
+      - name: acv_usd
+        data_tests: [not_null]
+      - name: status
+        data_tests:
+          - accepted_values:
+              arguments:
+                values: ['active', 'renewed', 'churned', 'cancelled']
+
+  - name: invoices
+    description: Invoices and credit notes after the billing-migration formats are reconciled.
+    columns:
+      - name: invoice_id
+        data_tests: [unique, not_null]
+      - name: invoice_date
+        data_tests: [not_null]
+      - name: amount_local
+        data_tests: [not_null]
+      - name: amount_usd
+        data_tests: [not_null]
+      - name: subscription_id
+        data_tests:
+          - relationships:
+              arguments:
+                to: ref('subscriptions')
+                field: subscription_id
+      - name: billing_system
+        data_tests:
+          - accepted_values:
+              arguments:
+                values: ['legacy', 'new']
+      - name: document_type
+        data_tests:
+          - accepted_values:
+              arguments:
+                values: ['invoice', 'credit_note']
+
+  - name: users
+    columns:
+      - name: user_id
+        data_tests: [unique, not_null]
+      - name: email
+        data_tests: [not_null]
+      - name: account_id
+        data_tests:
+          - relationships:
+              arguments:
+                to: ref('accounts')
+                field: account_id
+
+  - name: usage_events
+    description: One row per real product event. Duplicates removed, event types and timestamps standardized.
+    columns:
+      - name: event_id
+        data_tests: [unique, not_null]
+      - name: event_at
+        description: When the event happened. Always analyze on this, not on the file it arrived in.
+        data_tests: [not_null]
+      - name: event_type
+        data_tests:
+          - accepted_values:
+              arguments:
+                values: ['login', 'search', 'report_download', 'dashboard_view', 'api_call', 'export']
+      - name: account_id
+        data_tests:
+          - not_null
+          - relationships:
+              arguments:
+                to: ref('accounts')
+                field: account_id
+      - name: platform
+        description: web / mobile / api. NULL before Sep 2025, when the app started logging it.
+
+  - name: fx_rates_monthly
+    columns:
+      - name: units_per_usd
+        data_tests: [not_null]

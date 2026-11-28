@@ -1,0 +1,17 @@
+# ---------------------------------------------------------------------------
+# Connection settings: tells dbt WHERE the database is.
+#
+# Safe to commit to GitHub: it holds no passwords. The database path comes
+# from the D2D_DB_PATH environment variable if set, otherwise it defaults to
+# <home folder>/duckdb/database_to_dashboard.duckdb (same as load_bronze.py).
+#
+# When we move to Snowflake, credentials will ALSO come from environment
+# variables via env_var(), so secrets never land in this file.
+# ---------------------------------------------------------------------------
+ridgeline:
+  target: dev
+  outputs:
+    dev:
+      type: duckdb
+      path: "{{ env_var('D2D_DB_PATH', env_var('USERPROFILE', env_var('HOME', '.')) ~ '/duckdb/database_to_dashboard.duckdb') }}"
+      threads: 4

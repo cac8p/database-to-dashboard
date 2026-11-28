@@ -1,0 +1,24 @@
+# ---------------------------------------------------------------------------
+# dbt project: Ridgeline Intelligence warehouse
+#
+# dbt turns SQL SELECT statements ("models") into tables, runs them in the
+# right order, and tests the results. Each .sql file in models/ = one table.
+# ---------------------------------------------------------------------------
+name: ridgeline
+version: "1.0.0"
+profile: ridgeline            # which connection to use (see profiles.yml)
+
+model-paths: ["models"]
+macro-paths: ["macros"]
+test-paths: ["tests"]
+
+clean-targets: ["target", "dbt_packages"]
+
+flags:
+  send_anonymous_usage_stats: false   # don't send usage telemetry to dbt Labs
+
+models:
+  ridgeline:
+    silver:
+      +schema: silver          # silver models are built in the "silver" schema
+      +materialized: table     # ...as real tables (not views)

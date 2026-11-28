@@ -1,0 +1,30 @@
+# ---------------------------------------------------------------------------
+# SOURCES: tells dbt about the bronze tables that load_bronze.py created.
+# dbt doesn't build these; it only reads them. In SQL we refer to them as
+#   {{ source('bronze', 'crm_accounts') }}
+# instead of a hard-coded table name, so dbt can draw the lineage graph
+# (which table feeds which).
+# ---------------------------------------------------------------------------
+version: 2
+
+sources:
+  - name: bronze
+    description: Raw data loaded as-is by scripts/load_bronze.py. Every column is text.
+    schema: bronze
+    tables:
+      - name: crm_accounts
+        description: CRM company records, including prospects and duplicate entries.
+      - name: crm_sales_reps
+        description: Sales reps and their teams.
+      - name: billing_products
+        description: Product catalog with list prices.
+      - name: billing_subscriptions
+        description: One row per product per contract term.
+      - name: billing_invoices
+        description: Invoices and credit notes. Formats change at the April 2025 billing migration.
+      - name: app_users
+        description: Product users (people with log-ins).
+      - name: app_usage_events
+        description: Every product event, combined from monthly log files.
+      - name: ref_fx_rates_monthly
+        description: Monthly exchange rates, local currency units per 1 USD.

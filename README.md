@@ -20,7 +20,8 @@ An end-to-end analytics engineering project. It takes raw, messy data from a fic
 |---|---|---|
 | Source data | Python generator (pandas, Faker) | ✅ Done |
 | Database + bronze layer | DuckDB (local), then Snowflake | ✅ Bronze loaded |
-| Transformations + tests | dbt | ⏳ Next |
+| Silver layer + tests | dbt (9 models, 41 data tests) | ✅ Done |
+| Gold layer | dbt | ⏳ Next |
 | Dashboard | Power BI | ⏳ |
 | Second source | SEC EDGAR + FRED public APIs | ⏳ |
 
@@ -57,6 +58,10 @@ pip install -r requirements.txt
 python generator/generate_saas_data.py     # create the raw source data
 python scripts/load_bronze.py              # load it into DuckDB (bronze layer)
 python scripts/run_sql.py sql/01_first_look_bronze.sql   # explore it
+cd dbt
+dbt build                                  # build + test silver (and later gold)
+cd ..
+python scripts/run_sql.py sql/02_silver_before_after.sql  # see what silver fixed
 ```
 
 That creates about 2,000 accounts, 25,000 users, 4,500 subscriptions, 7,400 invoices and 390,000 usage events covering Jan 2023 to Oct 2026. The same seed always produces the same data.

@@ -17,9 +17,11 @@ dbt/**/target/
 dbt/**/dbt_packages/
 dbt/**/logs/
 
-# Secrets: never commit passwords or API keys
+dbt/.user.yml
+
+# Secrets: never commit passwords or API keys.
+# (dbt/profiles.yml IS committed: it holds no secrets, only env_var() lookups.)
 .env
-profiles.yml
 
 # Editor / OS clutter
 .vscode/
